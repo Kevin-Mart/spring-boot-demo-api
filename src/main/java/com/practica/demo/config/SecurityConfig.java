@@ -39,6 +39,13 @@ public class SecurityConfig {
                 .permitAll()
                 .anyRequest()
                 .authenticated()
+            )// 1. Deshabilitar X-Frame-Options para permitir los frames de H2
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin())
+                // 2. Permitir scripts e imágenes dentro de la misma interfaz de H2 (evita bloqueos CSP)
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives("script-src 'self' 'unsafe-inline'; object-src 'none';")
+                )
             ).sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
