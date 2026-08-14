@@ -16,6 +16,12 @@ spring:
       path: /h2-console
       
 app:
+
+  encryption:
+    secret-key: "1234567890123456"
+    iv: "abcdefghijklmnop"
+
+
   jwt:
     # Clave secreta HMAC (mínimo 256 bits). En producción va en variables de entorno / vault.
     secret-key: "VGhpc0lzQVN1ZmZpY2llbnRseUxvbmdTZWNyZXRLZXlGb3JKV1Q="
