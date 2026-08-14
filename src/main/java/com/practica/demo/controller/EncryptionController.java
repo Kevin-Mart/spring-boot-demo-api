@@ -11,7 +11,9 @@ import com.practica.demo.dto.encryption.EncryptRequest;
 import com.practica.demo.dto.encryption.EncryptResponse;
 import com.practica.demo.service.EncryptionService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Tag(name = "Encryptacion AES/CBC/PKCS5Padding", description = "Servicio de incryptacion de cualquier longitud")
 @RestController
 @RequestMapping("/api/encryption")
 public class EncryptionController {

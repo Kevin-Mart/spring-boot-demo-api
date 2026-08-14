@@ -1,6 +1,5 @@
 package com.practica.demo.auth.controller;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,8 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.practica.demo.auth.service.AuthService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
+@Tag(name = "Authenticacion", description = "Autenticacion, JWT, SpringSecurity")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor

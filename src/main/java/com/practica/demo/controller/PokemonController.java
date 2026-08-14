@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.practica.demo.dto.PokemonResponse;
 import com.practica.demo.service.PokemonService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "Pokemon", description = "Consultar datos de la PokeApi")
 @RestController
 @RequestMapping("/api/pokemon")
 public class PokemonController {

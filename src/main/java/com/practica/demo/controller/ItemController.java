@@ -13,6 +13,8 @@ import com.practica.demo.dto.ItemFilterRequest;
 import com.practica.demo.dto.NameResponse;
 import com.practica.demo.service.ItemService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+@Tag(name = "Filtrado de items", description = "Filtrar todos lo usuarios o por nombre")
 @RestController
 @RequestMapping("/api/items")
 public class ItemController {
