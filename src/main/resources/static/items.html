@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Usuarios</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav>
+    <strong>Demo App</strong>
+    <div class="links">
+      <a href="dashboard.html">← Volver</a>
+      <button class="secondary" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <div class="container wide">
+    <h1>Usuarios</h1>
+    <div id="error" class="error" style="display:none;"></div>
+
+    <div class="inline-form">
+      <div>
+        <label for="name">Buscar por nombre</label>
+        <input type="text" id="name" placeholder="Ej. Israel">
+      </div>
+      <button onclick="buscar()">Buscar</button>
+      <button class="secondary" onclick="listarTodos()">Ver todos</button>
+    </div>
+
+    <table id="resultTable" style="display:none;">
+      <thead>
+        <tr><th>Nombre</th></tr>
+      </thead>
+      <tbody id="resultBody"></tbody>
+    </table>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    requireAuth();
+
+    const errorBox = document.getElementById('error');
+    const table = document.getElementById('resultTable');
+    const tbody = document.getElementById('resultBody');
+
+    async function buscar() {
+      const name = document.getElementById('name').value;
+      await cargar(name);
+    }
+
+    async function listarTodos() {
+      document.getElementById('name').value = '';
+      await cargar(null);
+    }
+
+    async function cargar(name) {
+      errorBox.style.display = 'none';
+      const url = name ? `/api/items?name=${encodeURIComponent(name)}` : '/api/items';
+
+      const response = await apiFetch(url);
+      if (!response) return; // apiFetch ya redirigió si no había sesión
+
+      if (!response.ok) {
+        errorBox.textContent = 'No se pudo cargar la lista de usuarios';
+        errorBox.style.display = 'block';
+        table.style.display = 'none';
+        return;
+      }
+
+      const data = await response.json();
+      tbody.innerHTML = '';
+
+      if (data.length === 0) {
+        errorBox.textContent = 'No se encontraron resultados';
+        errorBox.style.display = 'block';
+        table.style.display = 'none';
+        return;
+      }
+
+      data.forEach((item) => {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        // OJO: asumo que el campo del DTO NameResponse se llama "name".
+        // Si tu DTO usa otro nombre (ej. "nombre"), cambia la línea de abajo.
+        td.textContent = item.name ?? item.nombre ?? JSON.stringify(item);
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      });
+
+      table.style.display = 'table';
+    }
+
+    // Al entrar a la vista, mostramos todos por defecto
+    listarTodos();
+  </script>
+</body>
+</html>

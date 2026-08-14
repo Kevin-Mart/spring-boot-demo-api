@@ -1,0 +1,162 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  background: #f4f5f7;
+  margin: 0;
+  color: #1f2328;
+}
+
+.container {
+  max-width: 480px;
+  margin: 60px auto;
+  background: #fff;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.container.wide {
+  max-width: 720px;
+}
+
+h1 {
+  font-size: 22px;
+  margin-bottom: 24px;
+}
+
+label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+textarea {
+  min-height: 100px;
+  font-family: inherit;
+}
+
+button {
+  background: #1f6feb;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+button:hover {
+  background: #1a5fd0;
+}
+
+button.secondary {
+  background: #6e7781;
+}
+
+button.secondary:hover {
+  background: #57606a;
+}
+
+.error {
+  color: #cf222e;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.link-row {
+  margin-top: 16px;
+  font-size: 14px;
+  text-align: center;
+}
+
+nav {
+  background: #fff;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  margin-bottom: 24px;
+}
+
+nav .links a {
+  margin-right: 16px;
+  text-decoration: none;
+  color: #1f6feb;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  text-decoration: none;
+  color: inherit;
+}
+
+.card h3 {
+  margin: 0 0 8px 0;
+}
+
+.card p {
+  margin: 0;
+  color: #57606a;
+  font-size: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid #d0d7de;
+  font-size: 14px;
+}
+
+.result-box {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f6f8fa;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.result-box p {
+  margin: 4px 0;
+}
+
+.inline-form {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.inline-form > div {
+  flex: 1;
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel principal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav>
+    <strong>Demo App</strong>
+    <div class="links">
+      <button class="secondary" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <div class="container wide">
+    <h1>¿Qué quieres hacer?</h1>
+    <div class="card-grid">
+      <a class="card" href="items.html">
+        <h3>Usuarios</h3>
+        <p>Buscar un usuario por nombre o ver el listado completo.</p>
+      </a>
+      <a class="card" href="pokemon.html">
+        <h3>Pokédex</h3>
+        <p>Consultar nombre, peso, altura y tipo de un pokémon.</p>
+      </a>
+      <a class="card" href="encrypt.html">
+        <h3>Cifrado AES</h3>
+        <p>Cifrar y descifrar una cadena de texto (AES/CBC/PKCS5Padding).</p>
+      </a>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    requireAuth();
+  </script>
+</body>
+</html>
