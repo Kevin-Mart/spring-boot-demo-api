@@ -37,6 +37,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(req ->
                 req.requestMatchers(
                     "/auth/**",
+                    "/error",
                     "/h2-console/**",
                     "/",
                     "/*.html",

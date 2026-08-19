@@ -14,7 +14,8 @@ spring:
     console:
       enabled: true
       path: /h2-console
-      
+      settings:
+        web-allow-others: true
 app:
 
   encryption:
@@ -23,8 +24,8 @@ app:
 
 
   jwt:
-    # Clave secreta HMAC (mínimo 256 bits). En producción va en variables de entorno / vault.
+    # Clave secreta (mínimo 256 bits). 
     secret-key: "VGhpc0lzQVN1ZmZpY2llbnRseUxvbmdTZWNyZXRLZXlGb3JKV1Q="
     expiration-minutes: 60
     refresh-token:
-      expiration: 604800000 #days
+      expiration: 604800000 # 7 days

@@ -2,6 +2,7 @@ package com.practica.demo.bitacora;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -24,13 +25,17 @@ public class Bitacora {
     @GeneratedValue
     private Long id;
 
-    private String usuario;
-    private String metodoHttp;
+    @Column(name = "app_user")
+    private String user;
+
+    private String httpMethod;
     private String endpoint;
-    private String metodoEjecutado;
-    private String parametros;
-    private String resultado;
-    private String mensajeError;
-    private Long duracionMs;
-    private LocalDateTime fecha;
+    private String executedMethod;
+    private String parameters;
+    private String result;
+    private String errorMessage;
+    private Long durationMs;
+
+    @Column(name = "created_at")
+    private LocalDateTime timestamp;
 }
