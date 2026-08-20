@@ -35,9 +35,10 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.password()))
                 .build();
         var savedUser = userRepository.save(user);
-        var jwtToken = jwtService.generateToken(user);
+        var jwtToken = jwtService.generateAccesToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
+        saveUserToken(savedUser, refreshToken);
         return new TokenResponse(jwtToken, refreshToken);
     }
     public TokenResponse login(LoginRequest  request){
@@ -47,10 +48,11 @@ public class AuthService {
                 request.password())
         );
         var user = userRepository.findByEmail(request.email()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
+        var jwtToken = jwtService.generateAccesToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
+        saveUserToken(user, refreshToken);
         return new TokenResponse(jwtToken, refreshToken);
     }
 
@@ -76,27 +78,20 @@ public class AuthService {
         tokenRepository.save(token);
     }
 
-    public TokenResponse refreshToken (final String authHeader){
-        if (authHeader == null || !authHeader.startsWith("Bearer ")){
-            throw new IllegalArgumentException("invalid Bearer token");
+    public TokenResponse refreshToken(final String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Invalid Bearer token");
         }
 
         final String refreshToken = authHeader.substring(7);
-        final String userEmail = jwtService.extractUsername(refreshToken);
+        final String userEmail = jwtService.extractUsername(refreshToken); 
 
-        if (userEmail == null){
-            throw new IllegalArgumentException("Invalid Refres Token");
-        }
         final User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException(userEmail));
 
-        if(!jwtService.isTokenValid(refreshToken,user)){
-            throw new IllegalArgumentException("Invalid Refresh Token");
-        }
-
-        final String accesToken = jwtService.generateToken(user);
+        final String accessToken = jwtService.generateAccesToken(user);
         revokeAllUserTokens(user);
-        saveUserToken(user, accesToken);
-        return new TokenResponse(accesToken, refreshToken);
+        saveUserToken(user, accessToken);
+        return new TokenResponse(accessToken, refreshToken);
     }
 }

@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -25,10 +28,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
-
-    private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final TokenRepository tokenRepository;
+
+    private final JwtDecoder jwtDecoder;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -60,12 +63,16 @@ public class SecurityConfig {
             ).sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt
+                    .decoder(jwtDecoder)
+                    .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+            )
             .logout(logout ->
                 logout.logoutUrl("/auth/logout")
                     .addLogoutHandler((request, response, authentication) -> {
                         final var authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-                        logout(authHeader);
+                        revocadoToken(authHeader);
                     })
                     .logoutSuccessHandler((request, response, authentication) -> 
                         SecurityContextHolder.clearContext())
@@ -73,18 +80,26 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private void logout(final String token){
-        if(token == null || !token.startsWith("Bearer ")){
-            throw new IllegalArgumentException("Invalid token");
-        }
+    private JwtAuthenticationConverter jwtAuthenticationConverter(){
+        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthoritiesClaimName("scope");
+        authoritiesConverter.setAuthorityPrefix("ROLE_");
 
-        final String jwtToken = token.substring(7);
-        final Token foundToken = tokenRepository.findByToken(jwtToken)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
-        foundToken.setExpired(true);
-        foundToken.setRevoked(true);
-        tokenRepository.save(foundToken);
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+        return converter;
     }
 
+    private void revocadoToken(final String authHeader){
+        if (authHeader == null || !authHeader.startsWith("Bearer ")){
+            throw new IllegalArgumentException("Token inválido");
+        }
+        final String jwt = authHeader.substring(7);
+        final var token = tokenRepository.findByToken(jwt)
+            .orElseThrow(() -> new IllegalArgumentException("Token inválido"));
+        token.setExpired(true);
+        token.setRevoked(true);
+        tokenRepository.save(token);
+    }
 
 }

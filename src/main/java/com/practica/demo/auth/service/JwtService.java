@@ -1,82 +1,57 @@
 package com.practica.demo.auth.service;
 
-import java.util.Date;
-import java.util.Map;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
-import javax.crypto.SecretKey;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import com.practica.demo.usuario.User;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${app.jwt.secret-key}")
-    private String secreteKey;
-    @Value("${app.jwt.expiration-minutes}")
-    private long jwtExpiration;
-    @Value("${app.jwt.refresh-token.expiration}")
-    private long refreshExpiration;
 
+    private final JwtDecoder jwtDecoder;
+    private final JwtEncoder jwtEncoder;
 
-    public String extractUsername(final String token){
-        final Claims jwtToken = Jwts.parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-        return jwtToken.getSubject();
+    public String generateAccesToken(User user){
+        return buildToken(user,1, ChronoUnit.HOURS, "ACCESS");
     }
 
-    public String generateToken(final User user){
-        return buildToken(user,jwtExpiration);
+    public String generateRefreshToken(User user){
+        return buildToken(user,7, ChronoUnit.DAYS, "REFESH");
     }
 
-    public String generateRefreshToken(final User user){
-        return buildToken(user,refreshExpiration);
+    private String buildToken(User user, long amount, ChronoUnit unit, String type){
+        Instant now = Instant.now();
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("demo-app")
+                .issuedAt(now)
+                .expiresAt(now.plus(amount,unit))
+                .subject(user.getEmail())
+                .claim("userId", user.getId())
+                .claim("name", user.getName())
+                .claim("scope","USER")
+                .claim("token_type",type)
+                .build();
+        JwsHeader header = JwsHeader.with(SignatureAlgorithm.RS256).build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 
-    public String buildToken(final User user, final long expiration){
-        return Jwts.builder()
-        .id(user.getId().toString())
-        .claims(Map.of("name", user.getName()))
-        .subject(user.getEmail())
-        .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(new Date (System.currentTimeMillis()+ expiration*60_000))
-        .signWith(getSignInKey())
-        .compact();
+    public String extractUsername(final String token) {
+        return jwtDecoder.decode(token).getSubject();
     }
-
-    public boolean isTokenValid(final String token,final User user){
-        final String username= extractUsername(token);
-        return(username.equals(user.getEmail()) && !isTokenExpired(token));
-    }
-
-    public boolean isTokenExpired (final String token){
-        return extractExpiration(token).before(new Date());
-    }
-
-    public Date extractExpiration (final String token){
-        final Claims jwtToken = Jwts.parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-        return jwtToken.getExpiration();
-    }
-
-
-
-    private SecretKey getSignInKey(){
-        byte [] keyBytes = Decoders.BASE64.decode(secreteKey);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
 }
